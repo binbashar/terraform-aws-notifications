@@ -89,37 +89,48 @@ def format_cloudwatch_alarm(message: Dict[str, Any], region: str) -> Dict[str, A
     alarm_name = message["AlarmName"]
 
     return {
-        "color": CloudWatchAlarmState[message["NewStateValue"]].value,
-        "fallback": f"Alarm {alarm_name} triggered",
-        "fields": [
-            {"title": "Alarm Name", "value": f"`{alarm_name}`", "short": True},
+        "cards": [
             {
-                "title": "Alarm Description",
-                "value": f"`{message['AlarmDescription']}`",
-                "short": False,
-            },
-            {
-                "title": "Alarm reason",
-                "value": f"`{message['NewStateReason']}`",
-                "short": False,
-            },
-            {
-                "title": "Old State",
-                "value": f"`{message['OldStateValue']}`",
-                "short": True,
-            },
-            {
-                "title": "Current State",
-                "value": f"`{message['NewStateValue']}`",
-                "short": True,
-            },
-            {
-                "title": "Link to Alarm",
-                "value": f"{cloudwatch_url}#alarm:alarmFilter=ANY;name={urllib.parse.quote(alarm_name)}",
-                "short": False,
-            },
-        ],
-        "text": f"AWS CloudWatch notification - {message['AlarmName']}",
+                "header": {
+                    "title": "AWS CloudWatch",
+                    "subtitle": f"`{alarm_name}`",
+                    "imageUrl": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/robot_2/default/24px.svg",
+                    "imageStyle": "IMAGE"
+                },
+                "sections": [
+                    {
+                        "header": "Details",
+                        "widgets": [
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Alarm description:</b> `{message['NewStateReason']}`"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Alarm reason:</b> `{message['NewStateReason']}`"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Old State:</b> `{message['OldStateValue']}`"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Current State:</b> `{message['NewStateValue']}`"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Link to Alarm:</b> `{cloudwatch_url}#alarm:alarmFilter=ANY;name={urllib.parse.quote(alarm_name)}`"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
     }
 
 
@@ -153,43 +164,63 @@ def format_guardduty_finding(message: Dict[str, Any], region: str) -> Dict[str, 
         severity = "High"
 
     return {
-        "color": GuardDutyFindingSeverity[severity].value,
-        "fallback": f"GuardDuty Finding: {detail.get('title')}",
-        "fields": [
+        "cards": [
             {
-                "title": "Description",
-                "value": f"`{detail['description']}`",
-                "short": False,
-            },
-            {
-                "title": "Finding Type",
-                "value": f"`{detail['type']}`",
-                "short": False,
-            },
-            {
-                "title": "First Seen",
-                "value": f"`{service['eventFirstSeen']}`",
-                "short": True,
-            },
-            {
-                "title": "Last Seen",
-                "value": f"`{service['eventLastSeen']}`",
-                "short": True,
-            },
-            {"title": "Severity", "value": f"`{severity}`", "short": True},
-            {"title": "Account ID", "value": f"`{detail['accountId']}`", "short": True},
-            {
-                "title": "Count",
-                "value": f"`{service['count']}`",
-                "short": True,
-            },
-            {
-                "title": "Link to Finding",
-                "value": f"{guardduty_url}#/findings?search=id%3D{detail['id']}",
-                "short": False,
-            },
-        ],
-        "text": f"AWS GuardDuty Finding - {detail.get('title')}",
+                "header": {
+                    "title": "AWS GuardDuty",
+                    "subtitle": f"Finding: {detail.get('title')}",
+                    "imageUrl": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/robot_2/default/24px.svg",
+                    "imageStyle": "IMAGE"
+                },
+                "sections": [
+                    {
+                        "header": "Details",
+                        "widgets": [
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Description:</b> `{detail['description']}``"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Finding Type:</b> `{detail['type']}`"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>First Seen:</b> `{service['eventFirstSeen']}`"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Last Seen:</b> `{service['eventLastSeen']}`"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Severity:</b> `{severity}`"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Account ID:</b> `{detail['accountId']}`"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Count:</b> `{service['count']}`"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Link to Finding:</b> `{guardduty_url}#/findings?search=id%3D{detail['id']}`"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
     }
 
 
@@ -223,76 +254,60 @@ def format_aws_health(message: Dict[str, Any], region: str) -> Dict[str, Any]:
     service = detail.get("service", "<unknown>")
 
     return {
-        "color": AwsHealthCategory[detail["eventTypeCategory"]].value,
-        "text": f"New AWS Health Event for {service}",
-        "fallback": f"New AWS Health Event for {service}",
-        "fields": [
-            {"title": "Affected Service", "value": f"`{service}`", "short": True},
+        "cards": [
             {
-                "title": "Affected Region",
-                "value": f"`{message.get('region')}`",
-                "short": True,
-            },
-            {
-                "title": "Code",
-                "value": f"`{detail.get('eventTypeCode')}`",
-                "short": False,
-            },
-            {
-                "title": "Event Description",
-                "value": f"`{detail['eventDescription'][0]['latestDescription']}`",
-                "short": False,
-            },
-            {
-                "title": "Affected Resources",
-                "value": f"`{', '.join(resources)}`",
-                "short": False,
-            },
-            {
-                "title": "Start Time",
-                "value": f"`{detail.get('startTime', '<unknown>')}`",
-                "short": True,
-            },
-            {
-                "title": "End Time",
-                "value": f"`{detail.get('endTime', '<unknown>')}`",
-                "short": True,
-            },
-            {
-                "title": "Link to Event",
-                "value": f"{aws_health_url}",
-                "short": False,
-            },
-        ],
-    }
+                "header": {
+                    "title": "AWS Health",
+                    "subtitle": "New AWS Health Event for {service}",
+                    "imageUrl": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/robot_2/default/24px.svg",
+                    "imageStyle": "IMAGE"
+                },
+                "sections": [
+                    {
+                        "header": "Details",
+                        "widgets": [
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Affected Region:</b> {message.get('region')}"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Code:</b> {detail.get('eventTypeCode')}"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Event Description:</b> {detail['eventDescription'][0]['latestDescription']}"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Affected Resources:</b> {', '.join(resources)}"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Start Time:</b> {detail.get('startTime', '<unknown>')}"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>End Time:</b> {detail.get('endTime', '<unknown>')}"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Link to Event:</b> {aws_health_url}"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }   
 
-
-def aws_backup_field_parser(message: str) -> Dict[str, str]:
-    """
-    Parser for AWS Backup event message. It extracts the fields from the message and returns a dictionary.
-
-    :params message: message containing AWS Backup event
-    :returns: dictionary containing the fields extracted from the message
-    """
-    # Order is somewhat important, working in reverse order of the message payload
-    # to reduce right most matched values
-    field_names = {
-        "BackupJob ID": r"(BackupJob ID : ).*",
-        "Resource ARN": r"(Resource ARN : ).*[.]",
-        "Recovery point ARN": r"(Recovery point ARN: ).*[.]",
-    }
-    fields = {}
-
-    for fname, freg in field_names.items():
-        match = re.search(freg, message)
-        if match:
-            value = match.group(0).split(" ")[-1]
-            fields[fname] = value.removesuffix(".")
-
-            # Remove the matched field from the message
-            message = message.replace(match.group(0), "")
-
-    return fields
 
 
 def format_aws_backup(message: str) -> Dict[str, Any]:
@@ -303,9 +318,6 @@ def format_aws_backup(message: str) -> Dict[str, Any]:
     :returns: formatted Google message payload
     """
 
-    fields: list[Dict[str, Any]] = []
-    attachments = {}
-
     title = message.split(".")[0]
 
     if "failed" in title:
@@ -314,17 +326,30 @@ def format_aws_backup(message: str) -> Dict[str, Any]:
     if "completed" in title:
         title = f"✅ {title}"
 
-    fields.append({"title": title})
-
-    backup_fields = aws_backup_field_parser(message)
-
-    for k, v in backup_fields.items():
-        fields.append({"value": k, "short": False})
-        fields.append({"value": f"`{v}`", "short": False})
-
-    attachments["fields"] = fields  # type: ignore
-
-    return attachments
+    return {
+        "cards": [
+            {
+                "header": {
+                    "title": "AWS Backup",
+                    "subtitle": title,
+                    "imageUrl": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/robot_2/default/24px.svg",
+                    "imageStyle": "IMAGE"
+                },
+                "sections": [
+                    {
+                        "header": "Details",
+                        "widgets": [
+                            {
+                                "textParagraph": {
+                                    "text": message
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }   
 
 
 def format_default(
@@ -337,25 +362,45 @@ def format_default(
     :returns: formatted Google message payload
     """
 
-    attachments = {
-        "fallback": "A new message",
-        "text": "AWS notification",
-        "title": subject if subject else "Message",
-        "mrkdwn_in": ["value"],
-    }
-    fields = []
+    widgets = []
 
     if type(message) is dict:
         for k, v in message.items():
             value = f"{json.dumps(v)}" if isinstance(v, (dict, list)) else str(v)
-            fields.append({"title": k, "value": f"`{value}`", "short": len(value) < 25})
+            widgets.append(
+                {
+                    "textParagraph": {
+                        "text": f"<b>{k}:</b> {v}"
+                    }
+                }
+            )
     else:
-        fields.append({"value": message, "short": False})
+        widgets.append(
+            {
+                "textParagraph": {
+                    "text": message
+                }
+            }
+        )
 
-    if fields:
-        attachments["fields"] = fields  # type: ignore
-
-    return attachments
+    return {
+        "cards": [
+            {
+                "header": {
+                    "title": "AWS notification",
+                    "subtitle": "A new message",
+                    "imageUrl": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/robot_2/default/24px.svg",
+                    "imageStyle": "IMAGE"
+                },
+                "sections": [
+                    {
+                        "header": "Details",
+                        "widgets": [widgets]
+                    }
+                ]
+            }
+        ]
+    }   
 
 
 def get_google_message_payload(
@@ -370,37 +415,8 @@ def get_google_message_payload(
     :returns: Google message payload
     """
 
-    google_channel = os.environ["SLACK_CHANNEL"]
-    google_username = os.environ["SLACK_USERNAME"]
-    google_emoji = os.environ["SLACK_EMOJI"]
-
-    payload = {
-        "cards": [
-            {
-                "header": {
-                    "title": "AWS Notification",
-                    "subtitle": "service",
-                    "imageUrl": "https://fonts.gstatic.com/s/i/materialicons/robot/v6/24px.svg",
-                    "imageStyle": "IMAGE"
-                },
-                "sections": [
-                    {
-                        "header": "Details",
-                        "widgets": [
-                            {
-                                "textParagraph": {
-                                    "text": "See [this doc](https://developers.google.com/apps-script/add-ons/concepts/widgets#text_formatting) for rich text formatting"
-                                }
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
+    payload = {}
     
-    attachment = None
-
     if isinstance(message, str):
         try:
             message = json.loads(message)
@@ -410,33 +426,23 @@ def get_google_message_payload(
     message = cast(Dict[str, Any], message)
 
     if "AlarmName" in message:
-        notification = format_cloudwatch_alarm(message=message, region=region)
-        attachment = notification
+        payload = format_cloudwatch_alarm(message=message, region=region)
 
     elif (
         isinstance(message, Dict) and message.get("detail-type") == "GuardDuty Finding"
     ):
-        notification = format_guardduty_finding(
+        payload = format_guardduty_finding(
             message=message, region=message["region"]
         )
-        attachment = notification
 
     elif isinstance(message, Dict) and message.get("detail-type") == "AWS Health Event":
-        notification = format_aws_health(message=message, region=message["region"])
-        attachment = notification
+        payload = format_aws_health(message=message, region=message["region"])
 
     elif subject == "Notification from AWS Backup":
-        notification = format_aws_backup(message=str(message))
-        attachment = notification
-
-    elif "attachments" in message or "text" in message:
-        payload = {**payload, **message}
+        payload = format_aws_backup(message=str(message))
 
     else:
-        attachment = format_default(message=message, subject=subject)
-
-    if attachment:
-        payload["attachments"] = [attachment]  # type: ignore
+        payload = format_default(message=message, subject=subject)
 
     return payload
 
