@@ -455,17 +455,25 @@ def send_google_notification(payload: Dict[str, Any]) -> str:
     :returns: response details from sending notification
     """
 
-    google_url = os.environ["SLACK_WEBHOOK_URL"]
+    google_url = os.environ["GOOGLE_WEBHOOK_URL"]
     if not google_url.startswith("http"):
         google_url = decrypt_url(google_url)
 
-    data = urllib.parse.urlencode({"payload": json.dumps(payload)}).encode("utf-8")
-    req = urllib.request.Request(google_url)
+    data = json.dumps(payload).encode("utf-8")
+
+    headers = {"Content-Type": "application/json"}
 
     try:
-        result = urllib.request.urlopen(req, data)
-        return json.dumps({"code": result.getcode(), "info": result.info().as_string()})
+        request = urllib.request.Request(google_url, data=data, headers=headers, method='POST')
+        with urllib.request.urlopen(request) as response:
+            response_data = response.read().decode('utf-8')
+            data = json.loads(response_data)
 
+        return json.dumps({
+            "code": 200,
+            "info": json.dumps(data)
+        })
+    
     except HTTPError as e:
         logging.error(f"{e}: result")
         return json.dumps({"code": e.getcode(), "info": e.info().as_string()})
