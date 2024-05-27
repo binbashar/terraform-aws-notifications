@@ -1,13 +1,35 @@
 ## Slack Variables
+variable "slack_webhook_url" {
+  description = "The URL of Slack webhook"
+  type        = string
+  default     = ""
+
+  validation {
+    condition = var.chatops_app != "slack" || (var.chatops_app == "slack" && length(var.google_webhook_url) > 0)
+    error_message = "The slack webhook url must be provided if chatops app is set to 'slack'."
+  }
+}
 
 variable "slack_channel" {
   description = "The name of the channel in Slack for notifications"
   type        = string
+  default     = ""
+
+  validation {
+    condition = var.chatops_app != "slack" || (var.chatops_app == "slack" && length(var.slack_channel) > 0)
+    error_message = "The slack channel url must be provided if chatops app is set to 'slack'."
+  }
 }
 
 variable "slack_username" {
   description = "The username that will appear on Slack messages"
   type        = string
+  default     = ""
+
+  validation {
+    condition = var.chatops_app != "slack" || (var.chatops_app == "slack" && length(var.slack_username) > 0)
+    error_message = "The slack username url must be provided if chatops app is set to 'slack'."
+  }
 }
 
 variable "slack_emoji" {
@@ -18,16 +40,28 @@ variable "slack_emoji" {
 
 ## Google Chat Variables
 
+variable "google_webhook_url" {
+  description = "The URL of Google webhook"
+  type        = string
+  default     = ""
+
+  validation {
+    condition = var.chatops_app != "google" || (var.chatops_app == "google" && length(var.google_webhook_url) > 0)
+    error_message = "The google webhook url must be provided if chatops app is set to 'slack'."
+  }
+}
+
 ## Common variables
 
 variable "chatops_app" {
-  default     = "Slack"
-  description = "Chatops app - Google, Slack, Teams"
-}
+  default     = "slack"
+  description = "Chatops app - google, slack"
+  type        = string 
 
-variable "webhook_url" {
-  description = "The URL of Chat App webhook"
-  type        = string
+  validation {
+    condition     = contains(["slack", "google"], var.chatops_app)
+    error_message = "The chatops_app variable must be either 'slack' or 'google'."
+  }
 }
 
 variable "architectures" {

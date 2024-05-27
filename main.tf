@@ -26,7 +26,22 @@ locals {
     resources = [var.kms_key_arn]
   }
 
-  lambda_handler = try(split(".", basename(var.lambda_source_path))[0], "notify_slack")
+  lambda_handler = try(split(".", basename(var.lambda_source_path))[0], "notify_${var.chatops_app}")
+
+  lambda_environment_variables = {
+    slack = {
+      SLACK_WEBHOOK_URL = var.slack_webhook_url
+      SLACK_CHANNEL     = var.slack_channel
+      SLACK_USERNAME    = var.slack_username
+      SLACK_EMOJI       = var.slack_emoji
+      LOG_EVENTS        = var.log_events ? "True" : "False" 
+    }
+
+    google = {
+      GOOGLE_WEBHOOK_URL = var.google_webhook_url
+      LOG_EVENTS         = var.log_events ? "True" : "False" 
+    }
+  }
 }
 
 data "aws_iam_policy_document" "lambda" {
@@ -68,7 +83,7 @@ resource "aws_sns_topic" "this" {
 }
 
 
-resource "aws_sns_topic_subscription" "sns_notify_slack" {
+resource "aws_sns_topic_subscription" "sns_notifications" {
   count = var.create ? 1 : 0
 
   topic_arn           = local.sns_topic_arn
@@ -89,7 +104,7 @@ module "lambda" {
 
   hash_extra                     = var.hash_extra
   handler                        = "${local.lambda_handler}.lambda_handler"
-  source_path                    = var.lambda_source_path != null ? "${path.root}/${var.lambda_source_path}" : "${path.module}/functions/notify_slack.py"
+  source_path                    = var.lambda_source_path != null ? "${path.root}/${var.lambda_source_path}" : "${path.module}/functions/notify_${var.chatops_app}.py"
   recreate_missing_package       = var.recreate_missing_package
   runtime                        = "python3.11"
   architectures                  = var.architectures
@@ -102,13 +117,7 @@ module "lambda" {
   # InvalidParameterValueException: We currently do not support adding policies for $LATEST."
   publish = true
 
-  environment_variables = {
-    SLACK_WEBHOOK_URL = var.webhook_url
-    SLACK_CHANNEL     = var.slack_channel
-    SLACK_USERNAME    = var.slack_username
-    SLACK_EMOJI       = var.slack_emoji
-    LOG_EVENTS        = var.log_events ? "True" : "False"
-  }
+  environment_variables = lookup(local.lambda_environment_variables, var.chatops_app)
 
   create_role               = var.lambda_role == ""
   lambda_role               = var.lambda_role
