@@ -72,9 +72,9 @@ def get_service_url(region: str, service: str) -> str:
 class CloudWatchAlarmState(Enum):
     """Maps CloudWatch notification state to Google message format color"""
 
-    OK = "good"
-    INSUFFICIENT_DATA = "warning"
-    ALARM = "danger"
+    OK = "👍"
+    INSUFFICIENT_DATA = "⚠️"
+    ALARM = "‼️"
 
 
 def format_cloudwatch_alarm(message: Dict[str, Any], region: str) -> Dict[str, Any]:
@@ -93,7 +93,7 @@ def format_cloudwatch_alarm(message: Dict[str, Any], region: str) -> Dict[str, A
             {
                 "header": {
                     "title": "AWS CloudWatch",
-                    "subtitle": f"`{alarm_name}`",
+                    "subtitle": f"{CloudWatchAlarmState[message['NewStateValue']].value} {alarm_name}",
                     "imageUrl": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/robot_2/default/24px.svg",
                     "imageStyle": "IMAGE"
                 },
@@ -103,27 +103,27 @@ def format_cloudwatch_alarm(message: Dict[str, Any], region: str) -> Dict[str, A
                         "widgets": [
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Alarm description:</b> `{message['NewStateReason']}`"
+                                    "text": f"<b>Alarm description:</b> {message['NewStateReason']}"
                                 }
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Alarm reason:</b> `{message['NewStateReason']}`"
+                                    "text": f"<b>Alarm reason:</b> {message['NewStateReason']}"
                                 }
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Old State:</b> `{message['OldStateValue']}`"
+                                    "text": f"<b>Old State:</b> {message['OldStateValue']}"
                                 }
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Current State:</b> `{message['NewStateValue']}`"
+                                    "text": f"<b>Current State:</b> {message['NewStateValue']}"
                                 }
                             },
                             {
-                                "textParagraph": {
-                                    "text": f"<b>Link to Alarm:</b> `{cloudwatch_url}#alarm:alarmFilter=ANY;name={urllib.parse.quote(alarm_name)}`"
+                                "textParagraph": { 
+                                    "text": f"<a href=\"{cloudwatch_url}#alarm:alarmFilter=ANY;name={urllib.parse.quote(alarm_name)}\">Link to Alarm</a>"
                                 }
                             }
                         ]
@@ -137,9 +137,9 @@ def format_cloudwatch_alarm(message: Dict[str, Any], region: str) -> Dict[str, A
 class GuardDutyFindingSeverity(Enum):
     """Maps GuardDuty finding severity to Google message format color"""
 
-    Low = "#777777"
-    Medium = "warning"
-    High = "danger"
+    Low = "⚠️"
+    Medium = "‼️"
+    High = "☠️"
 
 
 def format_guardduty_finding(message: Dict[str, Any], region: str) -> Dict[str, Any]:
@@ -168,7 +168,7 @@ def format_guardduty_finding(message: Dict[str, Any], region: str) -> Dict[str, 
             {
                 "header": {
                     "title": "AWS GuardDuty",
-                    "subtitle": f"Finding: {detail.get('title')}",
+                    "subtitle": f"{GuardDutyFindingSeverity[severity].value} Finding: {detail.get('title')}",
                     "imageUrl": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/robot_2/default/24px.svg",
                     "imageStyle": "IMAGE"
                 },
@@ -178,42 +178,42 @@ def format_guardduty_finding(message: Dict[str, Any], region: str) -> Dict[str, 
                         "widgets": [
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Description:</b> `{detail['description']}``"
+                                    "text": f"<b>Description:</b> {detail['description']}`"
                                 }
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Finding Type:</b> `{detail['type']}`"
+                                    "text": f"<b>Finding Type:</b> {detail['type']}"
                                 }
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>First Seen:</b> `{service['eventFirstSeen']}`"
+                                    "text": f"<b>First Seen:</b> {service['eventFirstSeen']}"
                                 }
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Last Seen:</b> `{service['eventLastSeen']}`"
+                                    "text": f"<b>Last Seen:</b> {service['eventLastSeen']}"
                                 }
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Severity:</b> `{severity}`"
+                                    "text": f"<b>Severity:</b> {severity}"
                                 }
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Account ID:</b> `{detail['accountId']}`"
+                                    "text": f"<b>Account ID:</b> {detail['accountId']}"
                                 }
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Count:</b> `{service['count']}`"
+                                    "text": f"<b>Count:</b> {service['count']}"
                                 }
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Link to Finding:</b> `{guardduty_url}#/findings?search=id%3D{detail['id']}`"
+                                    "text": f"<a href=\"{guardduty_url}#/findings?search=id%3D{detail['id']}\">Link to Finding</a>"
                                 }
                             }
                         ]
@@ -232,9 +232,9 @@ class AwsHealthCategory(Enum):
         accountNotification, and scheduledChange.
     """
 
-    accountNotification = "#777777"
-    scheduledChange = "warning"
-    issue = "danger"
+    accountNotification = "🔔"
+    scheduledChange = "⚠️"
+    issue = "‼️"
 
 
 def format_aws_health(message: Dict[str, Any], region: str) -> Dict[str, Any]:
@@ -258,7 +258,7 @@ def format_aws_health(message: Dict[str, Any], region: str) -> Dict[str, Any]:
             {
                 "header": {
                     "title": "AWS Health",
-                    "subtitle": "New AWS Health Event for {service}",
+                    "subtitle": f"{AwsHealthCategory[detail['eventTypeCategory']].value} New AWS Health Event for {service}",
                     "imageUrl": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/robot_2/default/24px.svg",
                     "imageStyle": "IMAGE"
                 },
@@ -298,7 +298,7 @@ def format_aws_health(message: Dict[str, Any], region: str) -> Dict[str, Any]:
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Link to Event:</b> {aws_health_url}"
+                                    "text": f"<a href=\"{aws_health_url}\">Link to Event</a>"
                                 }
                             }
                         ]
@@ -308,6 +308,33 @@ def format_aws_health(message: Dict[str, Any], region: str) -> Dict[str, Any]:
         ]
     }   
 
+
+def aws_backup_field_parser(message: str) -> Dict[str, str]:
+    """
+    Parser for AWS Backup event message. It extracts the fields from the message and returns a dictionary.
+
+    :params message: message containing AWS Backup event
+    :returns: dictionary containing the fields extracted from the message
+    """
+    # Order is somewhat important, working in reverse order of the message payload
+    # to reduce right most matched values
+    field_names = {
+        "BackupJob ID": r"(BackupJob ID : ).*",
+        "Resource ARN": r"(Resource ARN : ).*[.]",
+        "Recovery point ARN": r"(Recovery point ARN: ).*[.]",
+    }
+    fields = {}
+
+    for fname, freg in field_names.items():
+        match = re.search(freg, message)
+        if match:
+            value = match.group(0).split(" ")[-1]
+            fields[fname] = value.removesuffix(".")
+
+            # Remove the matched field from the message
+            message = message.replace(match.group(0), "")
+
+    return fields
 
 
 def format_aws_backup(message: str) -> Dict[str, Any]:
@@ -326,6 +353,18 @@ def format_aws_backup(message: str) -> Dict[str, Any]:
     if "completed" in title:
         title = f"✅ {title}"
 
+    backup_fields = aws_backup_field_parser(message)
+    widgets = []
+
+    for k, v in backup_fields.items():
+        widgets.append(
+            {
+                "textParagraph": {
+                    "text": f"<b>{k}:</b> {v}"
+                }
+            }
+        )
+
     return {
         "cards": [
             {
@@ -338,13 +377,7 @@ def format_aws_backup(message: str) -> Dict[str, Any]:
                 "sections": [
                     {
                         "header": "Details",
-                        "widgets": [
-                            {
-                                "textParagraph": {
-                                    "text": message
-                                }
-                            }
-                        ]
+                        "widgets": widgets
                     }
                 ]
             }
@@ -366,7 +399,6 @@ def format_default(
 
     if type(message) is dict:
         for k, v in message.items():
-            value = f"{json.dumps(v)}" if isinstance(v, (dict, list)) else str(v)
             widgets.append(
                 {
                     "textParagraph": {
@@ -488,7 +520,7 @@ def lambda_handler(event: Dict[str, Any], context: Dict[str, Any]) -> str:
     :returns: none
     """
     if os.environ.get("LOG_EVENTS", "False") == "True":
-        logging.info(f"Event logging enabled: `{json.dumps(event)}`")
+        logging.info(f"Event logging enabled: {json.dumps(event)}")
 
     for record in event["Records"]:
         sns = record["Sns"]
@@ -504,7 +536,7 @@ def lambda_handler(event: Dict[str, Any], context: Dict[str, Any]) -> str:
     if json.loads(response)["code"] != 200:
         response_info = json.loads(response)["info"]
         logging.error(
-            f"Error: received status `{response_info}` using event `{event}` and context `{context}`"
+            f"Error: received status {response_info} using event {event} and context {context}"
         )
 
     return response
