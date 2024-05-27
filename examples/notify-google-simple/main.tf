@@ -26,7 +26,7 @@ module "notify_slack" {
   create_sns_topic = true
 
   chatops_app        = "google"
-  google_webhook_url = "https://chat.googleapis.com/v1/spaces/AAAAXqL0N9Q/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=xIP8t0N_qj2XHB__JXIyzdaRKiTX-bChkjp9OM0hOmI"
+  google_webhook_url = "https://chat.googleapis.com/v1/spaces/AAAA/messages?key=BBBB"
 
   lambda_function_name = local.name
   lambda_description   = "Lambda function which sends notifications to Google"
