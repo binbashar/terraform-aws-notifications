@@ -13,10 +13,10 @@ locals {
 
 
 ################################################################################
-# Slack Notify Module
+# Slack Notifications Module
 ################################################################################
 
-module "notify_slack" {
+module "notify_google" {
   source = "../../"
 
   #
